@@ -1,4 +1,5 @@
 require('dotenv').config()
+const noteRoutes = require('./src/routes/noteRoutes')
 
 const express = require('express')
 const cors = require('cors')
@@ -8,10 +9,7 @@ const app = express()
 //Start middleware
 app.use(cors())
 app.use(express.json()) //For sending Json data's
-
-app.get('/', (req, res) => {
-  res.send('Notes App Works!!')
-})
+app.use('/api/notes', noteRoutes) // routes all note requests to noteRoutes
 
 const PORT = process.env.PORT || 5005
 app.listen(PORT, () => {
