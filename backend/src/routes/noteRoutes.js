@@ -32,4 +32,36 @@ router.post('/', async (req, res) => {
   }
 })
 
+//Delete(/api/notes/:id)
+router.delete('/:id', async (req, res) => {
+  try {
+    // get id from param
+    const { id } = req.params
+
+    //Check if id is valid
+    if (!id || isNaN(id)) {
+      return res.status(400).json({ error: 'This id is not valid.' })
+    }
+
+    //Check if note is exist db
+    const existingNote = await prisma.note.findUnique({
+      where: { id: Number(id) },
+    })
+
+    if (!existingNote) {
+      return res.status(404).json({ error: 'Note cannot find' })
+    }
+
+    await prisma.note.delete({
+      where: { id: Number(id) },
+    })
+    res.json({
+      message: `This note with ${id} this ID has been successfully deleted.`,
+    })
+  } catch (error) {
+    console.error('Error happend while deleting note', error)
+    res.status(500).json({ error: 'Something gone wrong!' })
+  }
+})
+
 module.exports = router
