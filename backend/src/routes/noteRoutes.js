@@ -64,4 +64,37 @@ router.delete('/:id', async (req, res) => {
   }
 })
 
+//Update a note by Id (Put /api/notes/:id)
+router.put('/:id', async (req, res) => {
+  try {
+    const { id } = req.params
+    const { title, content } = req.body
+
+    if (!id || isNaN(id)) {
+      return res.status(400).json({ error: 'Invalid note Id' })
+    }
+
+    const existingNote = await prisma.note.findUnique({
+      where: { id: Number(id) },
+    })
+
+    if (!existingNote) {
+      return res.status(404).json({ error: 'Note not found' })
+    }
+
+    const updateNote = await prisma.note.update({
+      where: { id: Number(id) },
+      data: {
+        title: title || existingNote.title,
+        content: content || existingNote.content,
+      },
+    })
+
+    res.json(updateNote)
+  } catch (error) {
+    console.error('Error updating note', error)
+    res.status(500).json({ error: 'An error occured while updating the note.' })
+  }
+})
+
 module.exports = router
