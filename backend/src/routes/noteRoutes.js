@@ -1,12 +1,15 @@
 const express = require('express')
 const router = express.Router()
 const prisma = require('../config/db')
+const authenticateUser = require('../middleware/authMiddleware')
 
 //(GET /api/notes)
-router.get('/', async (req, res) => {
+router.get('/', authenticateUser, async (req, res) => {
   try {
-    const notes = await prisma.note.findMany() // get all notes
-    res.json(notes)
+    const notes = await prisma.note.findMany({
+      where: { userId: req.user.userId },
+    })
+    res.json(notes) // get all notes
   } catch (error) {
     console.error('API Error', error)
     res.status(500).json({ error: 'Error in get all notes' })
@@ -14,86 +17,94 @@ router.get('/', async (req, res) => {
 })
 
 //Post(/api/notes)
-router.post('/', async (req, res) => {
+router.post('/', authenticateUser, async (req, res) => {
   try {
     const { title, content } = req.body
 
     if (!title || !content) {
-      return res.status(400).json({ error: 'Title and Content required!' })
+      return res.status(400).json({ error: 'Title and content are required.' })
     }
 
     const newNote = await prisma.note.create({
-      data: { title, content },
+      data: { title, content, userId: req.user.userId },
     })
     res.status(201).json(newNote)
   } catch (error) {
-    console.error('Error occured while created new Note!', error)
-    res.status(500).json({ error: 'Error happend' })
+    console.error('🔥 Error creating note:', error)
+    res
+      .status(500)
+      .json({ error: 'An error occurred while creating the note.' })
   }
 })
 
 //Delete(/api/notes/:id)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authenticateUser, async (req, res) => {
   try {
-    // get id from param
     const { id } = req.params
 
-    //Check if id is valid
-    if (!id || isNaN(id)) {
-      return res.status(400).json({ error: 'This id is not valid.' })
-    }
-
-    //Check if note is exist db
-    const existingNote = await prisma.note.findUnique({
+    const note = await prisma.note.findUnique({
       where: { id: Number(id) },
     })
-
-    if (!existingNote) {
-      return res.status(404).json({ error: 'Note cannot find' })
+    if (!note) {
+      return res.status(404).json({ error: 'Note not found!' })
     }
 
-    await prisma.note.delete({
-      where: { id: Number(id) },
-    })
-    res.json({
-      message: `This note with ${id} this ID has been successfully deleted.`,
-    })
+    if (note.userId !== req.user.userId) {
+      return res
+        .status(403)
+        .json({ error: 'You do not have permission to delete this note.' })
+    }
+    await prisma.note.delete({ where: { id: Number(id) } })
+
+    res.json({ message: 'Note deleted successfully' })
   } catch (error) {
-    console.error('Error happend while deleting note', error)
-    res.status(500).json({ error: 'Something gone wrong!' })
+    console.error('🔥 Error deleting note:', error)
+    res
+      .status(500)
+      .json({ error: 'An error occurred while deleting the note.' })
   }
 })
 
 //Update a note by Id (Put /api/notes/:id)
-router.put('/:id', async (req, res) => {
+router.put('/:id', authenticateUser, async (req, res) => {
   try {
     const { id } = req.params
     const { title, content } = req.body
 
-    if (!id || isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid note Id' })
-    }
-
-    const existingNote = await prisma.note.findUnique({
+    // Fetch the note
+    const note = await prisma.note.findUnique({
       where: { id: Number(id) },
     })
 
-    if (!existingNote) {
-      return res.status(404).json({ error: 'Note not found' })
+    if (!note) {
+      return res.status(404).json({ error: 'Note not found!' })
     }
 
-    const updateNote = await prisma.note.update({
+    console.log('Logged-in User ID:', req.user.userId)
+    console.log('Note Owner ID:', note.userId)
+
+    // Check if the note belongs to the authenticated user
+    if (note.userId !== req.user.userId) {
+      return res
+        .status(403)
+        .json({ error: 'You do not have permission to update this Note' })
+    }
+
+    // Update the note
+    const updatedNote = await prisma.note.update({
       where: { id: Number(id) },
       data: {
-        title: title || existingNote.title,
-        content: content || existingNote.content,
+        title: title || note.title,
+        content: content || note.content,
       },
     })
 
-    res.json(updateNote)
+    res.json(updatedNote)
   } catch (error) {
-    console.error('Error updating note', error)
-    res.status(500).json({ error: 'An error occured while updating the note.' })
+    console.error('🔥 Error updating note:', error)
+    res
+      .status(500)
+      .json({ error: 'An error occurred while updating the note.' })
   }
 })
 
