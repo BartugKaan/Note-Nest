@@ -80,9 +80,6 @@ router.put('/:id', authenticateUser, async (req, res) => {
       return res.status(404).json({ error: 'Note not found!' })
     }
 
-    console.log('Logged-in User ID:', req.user.userId)
-    console.log('Note Owner ID:', note.userId)
-
     // Check if the note belongs to the authenticated user
     if (note.userId !== req.user.userId) {
       return res
