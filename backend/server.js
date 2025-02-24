@@ -13,6 +13,7 @@ app.use(express.json()) //For sending Json data's
 app.use('/api/notes', noteRoutes) // routes all note requests to noteRoutes
 app.use('/api/auth', authRoutes)
 
+// Seting Port for Backend
 const PORT = process.env.PORT || 5005
 app.listen(PORT, () => {
   console.log(`Notes-App works on :${PORT} port...`)
