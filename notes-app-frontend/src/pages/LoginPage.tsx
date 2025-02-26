@@ -39,8 +39,11 @@ const LoginPage = () => {
   }
 
   return (
-    <div className="flex flex-col h-screen text-white">
-      <Navbar />
+    <div className="flex flex-col h-screen">
+      <div className="text-white">
+        <Navbar />
+      </div>
+
       <div className="flex flex-1">
         <div className="w-1/2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex flex-col justify-center items-center text-white p-12">
           <h2 className="text-4xl font-extrabold">Welcome Back!</h2>
