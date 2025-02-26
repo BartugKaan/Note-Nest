@@ -14,6 +14,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>
 
 const LoginPage = () => {
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate()
 
@@ -77,11 +78,20 @@ const LoginPage = () => {
 
               <div className="mb-4">
                 <label className="block text-gray-700">Password</label>
-                <input
-                  {...register('password')}
-                  type="password"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400"
-                />
+                <div className="relative">
+                  <input
+                    {...register('password')}
+                    type={isPasswordHidden ? 'password' : 'text'}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setIsPasswordHidden(!isPasswordHidden)}
+                    className="absolute inset-y-0 right-0 px-4 py-2 text-gray-600"
+                  >
+                    {isPasswordHidden ? 'Show' : 'Hide'}
+                  </button>
+                </div>
                 {errors.password && (
                   <p className="text-red-500 text-sm">
                     {errors.password.message}
