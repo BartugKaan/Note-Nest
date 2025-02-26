@@ -4,6 +4,7 @@ import * as z from 'zod'
 import axios from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '../components/Navbar'
 
 const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
@@ -28,70 +29,88 @@ const RegisterPage = () => {
   const onSubmit = async (data: RegisterForm) => {
     try {
       await axios.post('http://localhost:5005/api/auth/register', data)
-      navigate('/login') // Başarılı olunca login sayfasına yönlendir
+      navigate('/login')
     } catch (error) {
       setErrorMessage('Registration failed. Please try again.')
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-3xl text-center">📒</h2>
-        <h2 className="text-3xl font-bold text-center text-indigo-600">
-          Welcome to NoteNest
-        </h2>
-        <h2 className="text-2xl font-bold text-center text-indigo-600">
-          Create an Account
-        </h2>
+    <div className="flex flex-col h-screen text-white">
+      <Navbar />
 
-        {errorMessage && (
-          <p className="text-red-500 text-center mt-2">{errorMessage}</p>
-        )}
+      <div className="flex flex-1">
+        <div className="w-1/2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 flex flex-col justify-center items-center text-white p-12">
+          <h2 className="text-4xl font-extrabold">Join Notes App Today!</h2>
+          <p className="text-lg text-center mt-4 max-w-md">
+            Create an account and start managing your notes effectively.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
-          <div className="mb-4">
-            <label className="block text-gray-700">Name</label>
-            <input
-              {...register('name')}
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-            {errors.name && (
-              <p className="text-red-500 text-sm">{errors.name.message}</p>
+        <div className="w-1/2 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-2xl font-bold text-center text-gray-800">
+              Create an Account
+            </h2>
+
+            {errorMessage && (
+              <p className="text-red-500 text-center mt-2">{errorMessage}</p>
             )}
-          </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700">Email</label>
-            <input
-              {...register('email')}
-              type="email"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
+              <div className="mb-4">
+                <label className="block text-gray-700">Name</label>
+                <input
+                  {...register('name')}
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+                />
+                {errors.name && (
+                  <p className="text-red-500 text-sm">{errors.name.message}</p>
+                )}
+              </div>
 
-          <div className="mb-4">
-            <label className="block text-gray-700">Password</label>
-            <input
-              {...register('password')}
-              type="password"
-              className="w-full px-4 py-2 border rounded-lg"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
-            )}
-          </div>
+              <div className="mb-4">
+                <label className="block text-gray-700">Email</label>
+                <input
+                  {...register('email')}
+                  type="email"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-sm">{errors.email.message}</p>
+                )}
+              </div>
 
-          <button
-            type="submit"
-            className="w-full  bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
-          >
-            Register
-          </button>
-        </form>
+              <div className="mb-4">
+                <label className="block text-gray-700">Password</label>
+                <input
+                  {...register('password')}
+                  type="password"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-400"
+                />
+                {errors.password && (
+                  <p className="text-red-500 text-sm">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition"
+              >
+                Register
+              </button>
+
+              <p className="text-center text-gray-600 mt-4">
+                Already have an account?{' '}
+                <a href="/login" className="text-indigo-600 hover:underline">
+                  Login
+                </a>
+              </p>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   )
