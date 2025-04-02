@@ -33,6 +33,28 @@ const Dashboard = () => {
     }
   }
 
+  const handleUpdateNote = async (
+    title: string,
+    content: string,
+    id?: number
+  ) => {
+    if (!id) return
+
+    try {
+      const response = await axios.put(
+        `http://localhost:5005/api/notes/${id}`,
+        { title, content },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+
+      setNotes((prevNotes) =>
+        prevNotes.map((n) => (n.id === id ? response.data : n))
+      )
+    } catch (error) {
+      console.error('Failed to update note:', error)
+    }
+  }
+
   const handleDeleteNote = async (id: number) => {
     try {
       await axios.delete(`http://localhost:5005/api/notes/${id}`, {
@@ -101,14 +123,32 @@ const Dashboard = () => {
         )}
       </div>
 
-      {/* NoteForm Model */}
+      {/* Create Form */}
       {showForm && (
         <NoteForm
+          mode="create"
           onSubmit={(title, content) => {
             handleAddNote(title, content)
             setShowForm(false)
           }}
           onClose={() => setShowForm(false)}
+        />
+      )}
+
+      {/* Edit Form */}
+      {showEditForm && selectedNote && (
+        <NoteForm
+          mode="edit"
+          note={selectedNote}
+          onSubmit={(title, content, id) => {
+            handleUpdateNote(title, content, id)
+            setShowEditForm(false)
+            setSelectedNote(null)
+          }}
+          onClose={() => {
+            setShowEditForm(false)
+            setSelectedNote(null)
+          }}
         />
       )}
     </div>
