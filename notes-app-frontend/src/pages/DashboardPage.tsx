@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Navbar from '../components/Navbar'
 import NoteForm from '../components/NoteForm'
+import NoteCard from '../components/NoteCard'
 
 type Note = {
   id: number
@@ -14,6 +15,8 @@ const Dashboard = () => {
   const [notes, setNotes] = useState<Note[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null)
+  const [showEditForm, setShowEditForm] = useState(false)
   const token = localStorage.getItem('token')
 
   const handleAddNote = async (title: string, content: string) => {
@@ -27,6 +30,17 @@ const Dashboard = () => {
       setNotes((prev) => [response.data, ...prev])
     } catch (error) {
       console.error('Failed to add note:', error)
+    }
+  }
+
+  const handleDeleteNote = async (id: number) => {
+    try {
+      await axios.delete(`http://localhost:5005/api/notes/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setNotes((prev) => prev.filter((note) => note.id !== id))
+    } catch (error) {
+      console.log('Failed to delete note:', error)
     }
   }
 
@@ -73,22 +87,21 @@ const Dashboard = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {notes.map((note) => (
-              <div
+              <NoteCard
                 key={note.id}
-                className="p-4 bg-yellow-300 text-gray-800 rounded-lg shadow-md transform hover:scale-105 transition"
-              >
-                <h3 className="text-xl font-semibold">{note.title}</h3>
-                <p className="text-sm mt-2">{note.content}</p>
-                <p className="text-xs text-gray-600 mt-4">
-                  Created: {new Date(note.createdAt).toLocaleDateString()}
-                </p>
-              </div>
+                note={note}
+                onDelete={handleDeleteNote}
+                onEdit={(note) => {
+                  setSelectedNote(note)
+                  setShowEditForm(true)
+                }}
+              />
             ))}
           </div>
         )}
       </div>
 
-      {/* NoteForm Modal */}
+      {/* NoteForm Model */}
       {showForm && (
         <NoteForm
           onSubmit={(title, content) => {
