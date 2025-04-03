@@ -29,7 +29,10 @@ const RegisterPage = () => {
 
   const onSubmit = async (data: RegisterForm) => {
     try {
-      await axios.post('http://localhost:5005/api/auth/register', data)
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        data
+      )
       navigate('/login')
     } catch (error) {
       setErrorMessage('Registration failed. Please try again.')

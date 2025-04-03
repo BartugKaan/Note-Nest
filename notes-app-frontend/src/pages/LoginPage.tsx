@@ -29,7 +29,7 @@ const LoginPage = () => {
   const onSubmit = async (data: LoginForm) => {
     try {
       const response = await axios.post(
-        'http://localhost:5005/api/auth/login',
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
         data
       )
       localStorage.setItem('token', response.data.token)

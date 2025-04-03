@@ -43,7 +43,7 @@ const Dashboard = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:5005/api/notes/${id}`,
+        `${import.meta.env.VITE_API_URL}/api/notes/${id}`,
         { title, content },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -58,7 +58,7 @@ const Dashboard = () => {
 
   const handleDeleteNote = async (id: number) => {
     try {
-      await axios.delete(`http://localhost:5005/api/notes/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/notes/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       setNotes((prev) => prev.filter((note) => note.id !== id))
@@ -71,7 +71,7 @@ const Dashboard = () => {
     const fetchUser = async () => {
       try {
         const userResponse = await axios.get(
-          'http://localhost:5005/api/auth/me',
+          `${import.meta.env.VITE_API_URL}/api/auth/me`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -85,7 +85,7 @@ const Dashboard = () => {
 
     const fetchNotes = async () => {
       try {
-        const response = await axios.get('http://localhost:5005/api/notes', {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/notes`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         setNotes(response.data)
