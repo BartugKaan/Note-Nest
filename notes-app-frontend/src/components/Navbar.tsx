@@ -20,7 +20,10 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white shadow-md py-4 px-8 flex justify-between items-center">
-      <Link to="/" className="text-2xl font-bold text-indigo-600">
+      <Link
+        to={isLogin ? '/dashboard' : '/'}
+        className="text-2xl font-bold text-indigo-600"
+      >
         NoteNest 📒
       </Link>
       {isLogin ? <LogoutButton onLogout={handleLogout} /> : <LoginButtons />}

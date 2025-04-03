@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [showForm, setShowForm] = useState(false)
   const [selectedNote, setSelectedNote] = useState<Note | null>(null)
   const [showEditForm, setShowEditForm] = useState(false)
+  const [user, setUser] = useState<{ name: string } | null>(null)
   const token = localStorage.getItem('token')
 
   const handleAddNote = async (title: string, content: string) => {
@@ -67,6 +68,21 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userResponse = await axios.get(
+          'http://localhost:5005/api/auth/me',
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        )
+        setUser(userResponse.data)
+      } catch (error) {
+        console.log('Failed to fect User', error)
+      }
+    }
+    fetchUser()
+
     const fetchNotes = async () => {
       try {
         const response = await axios.get('http://localhost:5005/api/notes', {
@@ -89,7 +105,7 @@ const Dashboard = () => {
 
       <div className="container mx-auto px-6 py-10">
         <h2 className="text-3xl font-bold text-center text-indigo-600 mb-8">
-          Your Notes
+          Welcome, {user?.name}🖖 <br /> Your Notes
         </h2>
         <div className="flex justify-center mb-8">
           <button
